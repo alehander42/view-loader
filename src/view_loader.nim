@@ -3,21 +3,17 @@ import macros, strformat, strutils, os
 type
   ViewLoaderException* = object of Exception
 
-macro render(path: static[string]): untyped =
-  # this depends on the template lib
-  quote:
-    "implement a render macro"
 
-macro loadViews*(path: static[string], functionName: untyped = ident"render"): untyped =
+macro loadViews*(path: static[string], functionName: untyped = ident("render")): untyped =
   ## Loads the views filenames from a constant path and generates a `functionName` proc
   ## which renders a view based on a path
-  ## The function calls render(path: string): string which is the expected API for
+  ## The function calls render(path: string): string and updateRenderBase(path: string) which is the expected API for
   ## template libs
   ## 
   ## .. code-block:: nim
   ##     loadViews("my_view_dir", render)
   var views: seq[string]
-  for view in walkDir(currentSourcePath.parentDir & "/" & path, relative=true):
+  for view in walkDir(path, relative=true):
     let name = view.path.splitFile[1]
     views.add(name)
 
@@ -43,10 +39,14 @@ macro loadViews*(path: static[string], functionName: untyped = ident"render"): u
     ))
 
   result[^1] = code
-  # echo result.repr
+  result = quote:
+    updateRenderBase(`path`)
+    `result`
+  echo result.repr
 
 
 when isMainModule:
+  
   discard existsOrCreateDir("views")
   writeFile("views/view.nim", "test")
   loadViews("../views", render)
