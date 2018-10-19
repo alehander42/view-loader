@@ -36,5 +36,5 @@ TODO: add support for multiple path directories and layouts
 
 ### Support
 
-discussions with @yyyc514 inspired me to try to work on reusable view tooling
+discussions with [@yyyc514](https://github.com/yyyc514) inspired me to try to work on reusable view tooling
 
